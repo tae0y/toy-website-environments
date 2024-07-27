@@ -3,21 +3,26 @@
 name: deploy
 
 on:
-  workflow_call:
-    inputs:
-      environmentType:
-        required: true
-        type: string
-      resourceGroupName:
-        required: true
-        type: string
-    secrets:
-      AZURE_CLIENT_ID:
-        required: true
-      AZURE_TENANT_ID:
-        required: true
-      AZURE_SUBSCRIPTION_ID:
-        required: true
+    workflow_call:
+      inputs:
+        environmentType:
+          required: true
+          type: string
+        resourceGroupName:
+          required: true
+          type: string
+        reviewApiUrl:
+          required: true
+          type: string
+      secrets:
+        AZURE_CLIENT_ID:
+          required: true
+        AZURE_TENANT_ID:
+          required: true
+        AZURE_SUBSCRIPTION_ID:
+          required: true
+        reviewApiKey:
+          required: true
 
 jobs:
   validate:
@@ -39,8 +44,10 @@ jobs:
          template: ./deploy/main.bicep
          parameters: >
            environmentType=${{ inputs.environmentType }}
+           reviewApiUrl=${{ inputs.reviewApiUrl }}
+           reviewApiKey=${{ secrets.reviewApiKey }}
          deploymentMode: Validate
-         scope: 'resource-group'
+         scope: 'resource-group' # scope를 설정해줬지만 맞는 방법인지 잘모르겠음
      - if: inputs.environmentType == 'Production'
        uses: azure/arm-deploy@v1
        name: Run what-if
@@ -50,8 +57,10 @@ jobs:
          template: ./deploy/main.bicep
          parameters: >
            environmentType=${{ inputs.environmentType }}
+           reviewApiUrl=${{ inputs.reviewApiUrl }}
+           reviewApiKey=${{ secrets.reviewApiKey }}
          additionalArguments: --what-if
-         scope: 'resource-group'
+         scope: 'resource-group'  # scope를 설정해줬지만 맞는 방법인지 잘모르겠음
 
   deploy:
     needs: validate
@@ -77,7 +86,9 @@ jobs:
         template: ./deploy/main.bicep
         parameters: >
           environmentType=${{ inputs.environmentType }}
-        scope: 'resource-group'
+          reviewApiUrl=${{ inputs.reviewApiUrl }}
+          reviewApiKey=${{ secrets.reviewApiKey }}
+        scope: 'resource-group'  # scope를 설정해줬지만 맞는 방법인지 잘모르겠음
 
   smoke-test:
     runs-on: ubuntu-latest
