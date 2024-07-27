@@ -23,7 +23,7 @@ jobs:
     needs: lint
     with:
       environmentType: Test
-      resourceGroupName: rg-tae0y
+      resourceGroupName: rg-tae0y
       reviewApiUrl: https://sandbox.contoso.com/reviews
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TEST }}
